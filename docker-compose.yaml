@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  front-envoy:
+    build:
+      context: .
+      dockerfile: frontenvoy.Dockerfile
+    volumes:
+      - ./front-envoy.yaml:/etc/front-envoy.yaml
+    networks:
+      - envoymesh
+    expose:
+      - "80"
+      - "8001"
+    ports:
+      - "8000:80"
+      - "8001:8001"
+
+  service1:
+    build:
+      context: .
+      dockerfile: svc.Dockerfile
+    networks:
+      envoymesh:
+        aliases:
+          - service1
+    environment:
+      - SERVER_PORT=8080
+      - SERVICE=service1
+    expose:
+      - "8080"
+  service2:
+    build:
+      context: .
+      dockerfile: svc.Dockerfile
+    networks:
+      envoymesh:
+        aliases:
+          - service2
+    environment:
+      - SERVER_PORT=8081
+      - SERVICE=service2
+    expose:
+      - "8081"
+networks:
+  envoymesh: {}
